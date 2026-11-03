@@ -1,0 +1,99 @@
+# hybrid-rag Configuration
+# All paths relative to project root unless absolute
+
+project:
+  name: hybrid-rag
+  version: "0.1.0"
+
+data:
+  raw_dir: data/raw
+  processed_dir: data/processed
+  eval_dir: data/eval
+  # Corpus sources (local markdown/txt preferred for reproducibility)
+  corpus_glob: "data/raw/**/*.{md,txt}"
+
+chunking:
+  # Documented strategy: recursive character splitting with overlap
+  # Motivated by preserving semantic units while controlling context window
+  strategy: recursive_character
+  chunk_size: 512          # tokens approx (chars ~4x)
+  chunk_overlap: 64
+  separators: ["\n\n", "\n", ". ", " ", ""]
+  # Length function uses tiktoken cl100k_base for OpenAI-compatible counting
+  length_function: tiktoken
+  encoding_name: cl100k_base
+
+embeddings:
+  # Dense: sentence-transformers (local, free, good quality)
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"
+  # Alternative: "BAAI/bge-small-en-v1.5" or OpenAI text-embedding-3-small
+  device: cpu              # or cuda
+  normalize: true
+  batch_size: 32
+
+sparse:
+  # BM25 parameters (Okapi)
+  k1: 1.5
+  b: 0.75
+
+retrieval:
+  top_k_dense: 20
+  top_k_sparse: 20
+  # Hybrid fusion: Reciprocal Rank Fusion (RRF)
+  fusion_method: rrf
+  rrf_k: 60
+  # Final candidates before re-ranking
+  top_k_hybrid: 15
+
+reranking:
+  enabled: true
+  # Cross-encoder for precise relevance scoring
+  model_name: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+  top_k: 5                 # Final contexts passed to generator
+  device: cpu
+
+generation:
+  # Options:
+  #   openai       → requires OPENAI_API_KEY (recommended for quality)
+  #   ollama       → local, free (install https://ollama.com)
+  #   huggingface  → pure local transformers (slower, more RAM)
+  #   mock         → no LLM, useful for testing retrieval only
+  provider: openai
+  model: "gpt-4o-mini"
+  # For ollama: model: "llama3.2"
+  # For huggingface: model: "HuggingFaceTB/SmolLM2-1.7B-Instruct"
+  temperature: 0.1
+  max_tokens: 1024
+  # System prompt template lives in src/generation/prompts.py
+  include_citations: true
+  citation_style: inline   # [1], [2] ... mapped to sources
+
+evaluation:
+  # RAGAS metrics
+  metrics:
+    - faithfulness
+    - answer_relevancy
+    - context_precision
+    - context_recall
+  # Retrieval metrics (computed offline)
+  retrieval_metrics:
+    - precision_at_k
+    - recall_at_k
+    - mrr
+  k_values: [1, 3, 5]
+  # Judge LLM for RAGAS
+  # provider: openai | ollama | huggingface
+  judge_provider: openai
+  judge_model: "gpt-4o-mini"
+  # For local: judge_provider: ollama  /  judge_model: "llama3.2"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  title: "hybrid-rag API"
+  version: "0.1.0"
+  cors_origins: ["*"]
+
+logging:
+  level: INFO
+  format: "%(asctime)s | %(levelname)s | %(name)s | %(message)s"

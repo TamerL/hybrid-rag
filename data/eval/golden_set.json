@@ -1,0 +1,50 @@
+[
+  {
+    "question": "What is the formula for scaled dot-product attention in Transformers?",
+    "ground_truth": "Attention(Q, K, V) = softmax(QK^T / sqrt(d_k)) V",
+    "relevant_file_ids": [],
+    "notes": "Should retrieve the transformers.md chunk discussing self-attention."
+  },
+  {
+    "question": "Why do we use hybrid retrieval instead of pure dense or pure sparse?",
+    "ground_truth": "Dense retrieval fails on rare terms and exact identifiers; sparse (BM25) cannot capture paraphrases. Hybrid combines both strengths via methods like RRF.",
+    "relevant_file_ids": [],
+    "notes": "hybrid_retrieval.md"
+  },
+  {
+    "question": "What are typical chunk_size and overlap settings recommended for technical English text?",
+    "ground_truth": "chunk_size 400–800 tokens and overlap 10–20% of chunk size. This repository uses 512 / 64.",
+    "relevant_file_ids": [],
+    "notes": "chunking_strategies.md"
+  },
+  {
+    "question": "Name two common fusion methods for hybrid retrieval.",
+    "ground_truth": "Score normalization + weighted sum, and Reciprocal Rank Fusion (RRF).",
+    "relevant_file_ids": [],
+    "notes": "hybrid_retrieval.md"
+  },
+  {
+    "question": "What metrics does RAGAS commonly measure for RAG systems?",
+    "ground_truth": "Faithfulness, Answer Relevancy, Context Precision, and Context Recall.",
+    "relevant_file_ids": [],
+    "notes": "evaluation_metrics.md and rag_overview.md"
+  },
+  {
+    "question": "What positional encoding did the original Transformer paper use?",
+    "ground_truth": "Fixed sinusoidal encodings: PE_(pos, 2i) = sin(pos / 10000^(2i/d_model)) and cosine for odd dimensions.",
+    "relevant_file_ids": [],
+    "notes": "transformers.md"
+  },
+  {
+    "question": "What is FAISS and why is it used?",
+    "ground_truth": "Facebook AI Similarity Search – a library for efficient approximate nearest neighbor search used in many production dense retrieval systems.",
+    "relevant_file_ids": [],
+    "notes": "embeddings.md"
+  },
+  {
+    "question": "List common failure modes of RAG systems.",
+    "ground_truth": "Retrieval misses relevant documents, low precision of retrieved docs, generator ignores context or hallucinates, chunk boundaries split critical info, vocabulary mismatch.",
+    "relevant_file_ids": [],
+    "notes": "rag_overview.md"
+  }
+]
